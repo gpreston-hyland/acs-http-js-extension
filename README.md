@@ -8,7 +8,7 @@ An HTTP call (GET, POST, PUT etc) has to be triggered from ACS. The referenced p
 
 This updated version implements the AWS signature authentication for the HTTP type request. Currently it implements only a new `postaws()` method to work with the Amazon AWS Access Key and Secret Key.
 
-### Prerequisites to run this demo end-2-end
+### Prerequisites to use this extension in ACS
 
 * Alfresco Content Services (Version 7.2 and above and compiled with Java 11)  
 *For Alfresco Demo Platform up through 7.4.0 have Java 11 in the content container, so make sure to build the jars with Java 11!*
@@ -19,7 +19,8 @@ This updated version implements the AWS signature authentication for the HTTP ty
 
 ## Configuration Steps
 
-1. Deploy the [acs-http-js-1.0.0.jar](assets/acs-http-js-1.0.0.jar) file to ACS. Full credits and thanks to [Rui Fernandes](https://github.com/rjmfernandes), [Sherry Matthews](https://github.com/sherrymax/), and [Olufemi Okanlomo](https://github.com/ookanlomo) for their previous ideas and contributions this is building upon.
+1. Deploy the [acs-http-js-1.0.0.jar](assets/acs-http-js-1.0.0.jar) file to ACS.  
+Full credits and thanks to [Rui Fernandes](https://github.com/rjmfernandes), [Sherry Matthews](https://github.com/sherrymax/), and [Olufemi Okanlomo](https://github.com/ookanlomo) for their previous ideas and contributions this is building upon.
 2. Restart ACS Server/Container.
 
 ## JavaScript examples that invoke HTTP with Basic Authentication
