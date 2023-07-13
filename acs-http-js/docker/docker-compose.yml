@@ -1,0 +1,74 @@
+version: '3.4'
+services:
+#  Optional
+  acs-http-js-share:
+#    image: ${docker.share.image}:${alfresco.share.version}
+    image: ${docker.share.image}:${alfresco.share.docker.version}
+    environment:
+      REPO_HOST: acs-http-js-acs
+      REPO_PORT: 8080
+    ports:
+      - "${share.port}:8080"
+  acs-http-js-acs:
+    image: alfresco-content-services-acs-http-js:development
+    build:
+      dockerfile: ./Dockerfile
+      context: ../../../target
+    environment:
+      JAVA_TOOL_OPTIONS: "${keystore.settings}"
+      JAVA_OPTS: "
+        -Dsolr.secureComms=secret
+        -Dsolr.sharedSecret=secret
+        -Dmessaging.broker.url=\"failover:(nio://acs-http-js-activemq:61616)?timeout=3000&jms.useCompression=true\"
+        "
+      CATALINA_OPTS: "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=0.0.0.0:8888"
+    ports:
+      - "${acs.port}:8080"
+      - "${acs.debug.port}:8888"
+    volumes:
+      - acs-http-js-acs-volume:/usr/local/tomcat/alf_data
+    depends_on:
+      - acs-http-js-postgres
+  acs-http-js-postgres:
+    image: postgres:9.6
+    environment:
+      POSTGRES_DB: alfresco
+      POSTGRES_USER: alfresco
+      POSTGRES_PASSWORD: alfresco
+    command: postgres -c max_connections=300 -c log_min_messages=LOG
+    ports:
+      - "${postgres.port}:5432"
+    volumes:
+      - acs-http-js-db-volume:/var/lib/postgresql/data
+  acs-http-js-ass:
+    image: alfresco/alfresco-search-services:2.0.3
+    environment:
+      SOLR_ALFRESCO_HOST: acs-http-js-acs
+      SOLR_ALFRESCO_PORT: 8080
+      SOLR_SOLR_HOST: acs-http-js-ass
+      SOLR_SOLR_PORT: 8983
+      SOLR_CREATE_ALFRESCO_DEFAULTS: alfresco,archive
+      ALFRESCO_SECURE_COMMS: "secret"
+      JAVA_TOOL_OPTIONS: "-Dalfresco.secureComms.secret=secret"
+    ports:
+      - "8983:8983"
+    volumes:
+      - acs-http-js-ass-volume:/opt/alfresco-search-services/contentstore
+      - acs-http-js-ass-volume:/opt/alfresco-search-services/data
+  acs-http-js-activemq:
+#      image: alfresco/alfresco-activemq:5.16.1
+      image: alfresco/alfresco-activemq:5.17.1-jre11-rockylinux8
+      mem_limit: 1g
+      ports:
+        - 8161:8161 # Web Console
+        - 5672:5672 # AMQP
+        - 61616:61616 # OpenWire
+        - 61613:61613 # STOMP
+
+volumes:
+  acs-http-js-acs-volume:
+    external: true
+  acs-http-js-db-volume:
+    external: true
+  acs-http-js-ass-volume:
+    external: true
